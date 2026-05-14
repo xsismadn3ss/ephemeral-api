@@ -7,7 +7,7 @@ from src.app.models import Product, ProductInput
 from src.app.services import products as products_service
 from src.app.utils.mongo import get_db
 
-router = APIRouter(prefix="/products")
+router = APIRouter(prefix="/products", tags=["products"])
 
 
 @router.get("/", response_model=List[Product])

@@ -1,5 +1,16 @@
+from datetime import datetime
+
 from bson.objectid import ObjectId
 from pymongo.database import Database
+
+
+def ensure_product_indexes(db: Database) -> None:
+    db.products.create_index(
+        "expiresAt",
+        expireAfterSeconds=60 * 3,
+        name="products_expiresAt_ttl",
+        partialFilterExpression={"sold": True},
+    )
 
 
 def list_products(db: Database) -> list:
@@ -25,6 +36,15 @@ def create_product(db: Database, product: dict):
 
 def update_product(db: Database, product_id: str, product: dict):
     result = db.products.update_one({"_id": ObjectId(product_id)}, {"$set": product})
+    return result.modified_count
+
+
+def set_as_sold(db: Database, product_id: str) -> int:
+    """Marcar un producto como vendido y actualizar su fecha de expiración."""
+    result = db.products.update_one(
+        {"_id": ObjectId(product_id)},
+        {"$set": {"sold": True, "expiresAt": datetime.now()}},
+    )
     return result.modified_count
 
 

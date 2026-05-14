@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 
 from src.app.utils import mongo
 
-router = APIRouter(prefix="/health")
+router = APIRouter(prefix="/health", tags=["health"])
 
 
 @router.get("")

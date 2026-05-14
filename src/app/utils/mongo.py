@@ -13,7 +13,7 @@ def get_mongo_client(
     return MongoClient(config.mongo_uri)
 
 
-def get_db(config: APP_Config) -> Database:
+def get_db(config: Annotated[APP_Config, Depends(get_config)]) -> Database:
     client = get_mongo_client(config)
     return client[config.db_name]
 
