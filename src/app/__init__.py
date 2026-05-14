@@ -1,10 +1,8 @@
-from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from src.app.routes import products
-
-load_dotenv()
+from src.app.routes import health, products
 
 app = FastAPI()
 
 app.include_router(products.router)
+app.include_router(health.router)
