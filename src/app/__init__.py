@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from .routes import products
+from src.app.routes import products
 
 load_dotenv()
 
