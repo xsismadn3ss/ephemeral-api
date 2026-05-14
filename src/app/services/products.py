@@ -13,6 +13,10 @@ def ensure_product_indexes(db: Database) -> None:
     )
 
 
+def get_indexes(db: Database):
+    return db.products.index_information()
+
+
 def list_products(db: Database) -> list:
     products = db.products.find()
     data = []

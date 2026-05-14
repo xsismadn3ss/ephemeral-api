@@ -20,8 +20,11 @@ async def startup(app: FastAPI):
         raise Exception("MongoDB connection failed")
 
     db = mongo.get_db(config)
-    products.ensure_product_indexes(db)
-    print("Product indexes ensured")
+    indexes = products.get_indexes(db)
+    # Buscar si hay indice llamadao products_expiresAt_ttl
+    if "products_expiresAt_ttl" not in indexes:
+        products.ensure_product_indexes(db)
+        print("Product indexes ensured")
 
     _indexes_initialized = True
     yield
