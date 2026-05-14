@@ -5,8 +5,7 @@ from bson.objectid import ObjectId
 from fastapi import Depends
 from pymongo.database import Database
 
-from src.app.models import ReceiptInput
-from src.app.services import crypt
+from src.app.models import ProductMinified, ReceiptInput
 from src.app.services import products as products_service
 from src.app.utils.mongo import get_db
 
@@ -35,20 +34,18 @@ def create(
     p_cleaned = []
     total = 0.0
     for p in receipt.products:
-        p.clean_properties()
-        products_service.set_as_sold(db, p.id)
-        p_dict = p.model_dump()
-        p_dict.pop("expiresAt")
-        p_cleaned.append(p_dict)
-        total += p.price
+        result = products_service.set_as_sold(db, p.id)
+        if result:
+            p_dict = p.model_dump(by_alias=True)
+            p_cleaned.append(ProductMinified(**p_dict).model_dump())
+            total += p.price
 
     # Crear cifrado de los productos
-    encrypted = crypt.base64_encode({"products": p_cleaned})
     data_dict = receipt.model_dump(by_alias=True)
 
     # Eliminar llave products
     data_dict.pop("products")
-    data_dict["products_data"] = encrypted
+    data_dict["products_data"] = p_cleaned
     data_dict["total"] = total
     data_dict["date"] = datetime.now()
     data_dict["hash"] = None

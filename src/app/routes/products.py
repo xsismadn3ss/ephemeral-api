@@ -24,7 +24,6 @@ async def get_product(product_id: str):
     db = get_db(config)
 
     product = products_service.get_product(db, product_id)
-    print(product)
     if product is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
@@ -39,7 +38,6 @@ async def add_product(product: ProductInput):
 
     # Agregar producto a la base de datos
     reference = products_service.create_product(db, product.model_dump())
-    print(reference)
     # Enviar producto agregado
     return {"message": "Product added successfully", "product_id": str(reference)}
 

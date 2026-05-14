@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -20,8 +20,11 @@ class Product(BaseModel):
         default=datetime.now() + timedelta(weeks=52 * 10)
     )
 
-    def clean_properties(self):
-        self.properties = []
+
+class ProductMinified(BaseModel):
+    id: str = Field(alias="_id")
+    name: str = Field()
+    price: float = Field()
 
 
 class ProductInput(BaseModel):
@@ -37,9 +40,7 @@ class ProductInput(BaseModel):
 
 class Receipt(BaseModel):
     id: str = Field(alias="_id")
-    products_data: str = Field(
-        min_length=1, description="JSON cifrado con la informacion de los productos"
-    )
+    products_data: List[ProductMinified] = Field()
     total: float = Field()
     date: datetime = Field()
     hash: Optional[str] = Field(
