@@ -51,6 +51,7 @@ def create(
     data_dict["products_data"] = encrypted
     data_dict["total"] = total
     data_dict["data"] = datetime.now()
+    data_dict["hash"] = None
 
     result = db.receipts.insert_one(data_dict)
 
