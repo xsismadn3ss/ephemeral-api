@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from bson.objectid import ObjectId
 from pymongo.database import Database
@@ -47,7 +47,7 @@ def set_as_sold(db: Database, product_id: str) -> int:
     """Marcar un producto como vendido y actualizar su fecha de expiración."""
     result = db.products.update_one(
         {"_id": ObjectId(product_id)},
-        {"$set": {"sold": True, "expiresAt": datetime.now()}},
+        {"$set": {"sold": True, "expiresAt": datetime.now() + timedelta(minutes=3)}},
     )
     return result.modified_count
 
