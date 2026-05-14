@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from pymongo.database import Database
 
-from src.config import APP_Config
+from app.config import APP_Config
 
 
 def get_mongo_client(config: APP_Config) -> MongoClient:

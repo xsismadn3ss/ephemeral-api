@@ -2,10 +2,10 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException, status
 
-from src.config import APP_Config
-from src.models import Product, ProductInput
-from src.services import products as products_service
-from src.utils.mongo import get_db
+from app.config import APP_Config
+from app.models import Product, ProductInput
+from app.services import products as products_service
+from app.utils.mongo import get_db
 
 router = APIRouter(prefix="/products")
 
