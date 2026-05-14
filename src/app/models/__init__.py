@@ -41,7 +41,7 @@ class Receipt(BaseModel):
         min_length=1, description="JSON cifrado con la informacion de los productos"
     )
     total: float = Field()
-    date: datetime = Field()
+    date: str = Field()
     hash: Optional[str] = Field(
         description="Hash de la factura, hash generado en una blockchain"
     )
