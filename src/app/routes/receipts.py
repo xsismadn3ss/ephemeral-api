@@ -32,7 +32,7 @@ async def list_receipts(
     receipts = receipt_service.list(db)
 
     # Guardar facturas en la caché
-    cache.set(CacheKeys.ALL_RECEIPTS.value, {"receipts": receipts}, redis, ex=60 * 3)
+    cache.set(CacheKeys.ALL_RECEIPTS.value, {"receipts": receipts}, redis)
     return receipts
 
 
