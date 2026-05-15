@@ -4,12 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.app.config import get_config
 from src.app.routes import health, products, receipts
 from src.app.validation import startup
+from rich.console import Console
 
 config = get_config()
 
 is_dev = config.env == "development"
-
-_indexes_initialized = False
 
 
 app = FastAPI(
@@ -19,10 +18,14 @@ app = FastAPI(
     lifespan=startup,
 )
 
+console = Console()
+origins = config.origins.split(",") if config.origins else []
+console.log(f"[dim]Allowed origins: {origins}[/]")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=(
-        ["*"] if is_dev else config.origins.split(",") if config.origins else []
+        ["*"] if is_dev else origins
     ),
     allow_methods=["*"],
     allow_headers=["*"],
