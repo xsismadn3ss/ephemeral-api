@@ -25,6 +25,7 @@ class APP_Config:
     redis_port: Any = _get_optional_env("REDIS_PORT")
     redis_user: Any = _get_optional_env("REDIS_USER")
     redis_password: Any = _get_optional_env("REDIS_PASSWORD")
+    origins: str = os.getenv("ORIGINS", "")
 
 
 def get_config() -> APP_Config:

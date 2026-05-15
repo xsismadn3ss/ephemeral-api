@@ -12,5 +12,6 @@ services:
       REDIS_USER: ${REDIS_USER:-}
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       PORT: ${PORT:-8000}
+      ORIGINS: ${ORIGINS:-}
     ports:
       - "${PORT:-8000}:8000"
