@@ -37,7 +37,7 @@ def create(
         result = products_service.set_as_sold(db, p.id)
         if result:
             p_dict = p.model_dump(by_alias=True)
-            p_cleaned.append(ProductMinified(**p_dict).model_dump())
+            p_cleaned.append(ProductMinified(**p_dict).model_dump(by_alias=True))
             total += p.price
 
     # Crear cifrado de los productos
