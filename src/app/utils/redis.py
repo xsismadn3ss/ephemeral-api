@@ -8,7 +8,12 @@ from src.app.config import APP_Config, get_config
 
 
 def get_redis(config: Annotated[APP_Config, Depends(get_config)]):
-    redis = Redis(host=config.redis_host, port=int(config.redis_port))
+    redis = Redis(
+        host=config.redis_host,
+        port=int(config.redis_port),
+        username=config.redis_user,
+        password=config.redis_password,
+    )
     return redis
 
 

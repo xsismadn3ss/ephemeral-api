@@ -14,6 +14,8 @@ class APP_Config:
     db_name = os.getenv("DB_NAME", "ephemeral")
     redis_host: Any = os.getenv("REDIS_HOST")
     redis_port: Any = os.getenv("REDIS_PORT")
+    redis_user: Any = os.getenv("REDIS_USER")
+    redis_password: Any = os.getenv("REDIS_PASSWORD")
 
 
 def get_config() -> APP_Config:
