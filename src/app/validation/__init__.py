@@ -10,12 +10,25 @@ from src.app.validation import mongo
 @asynccontextmanager
 async def startup(app: FastAPI):
     """
-    Startup context manager for the application.
-    Ensures MongoDB connection and product indexes are initialized.
+    Validaciones para MongoDB y Redis al iniciar la aplicación.
+    Si alguna de las validaciones falla, se lanzará una excepción
+    y la aplicación no se iniciará.
     """
-    config = get_config()
-    mongo.check_mongo(config)
-    mongo.check_mongo_indexes(config)
-    check_redis(config)
+    from rich.console import Console
 
+    console = Console()
+
+    with console.status(
+        "Validando configuraciones...", spinner="bouncingBall"
+    ) as status:
+        status.update("Obteniendo configuraciones...")
+        config = get_config()
+        status.update("Validando conexión a MongoDB...")
+        mongo.check_mongo(config)
+        status.update("Validando índices de MongoDB...")
+        mongo.check_mongo_indexes(config)
+        status.update("Validando conexión a Redis...")
+        check_redis(config)
+
+    console.print("[dim]Infraestructura validada correctamente ✅[/]")
     yield
