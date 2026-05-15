@@ -1,3 +1,4 @@
+import json
 from typing import Annotated
 
 from fastapi import Depends
@@ -28,3 +29,12 @@ def check_redis(config: Annotated[APP_Config, Depends(get_config)]):
     if not result:
         raise ConnectionError("No se pudo conectar a Redis")
     return True
+
+
+def get_key(key: str, redis: Redis):
+    cached = redis.get(key)
+    if cached:
+        try:
+            return json.loads(cached)  # type: ignore
+        except Exception:
+            pass
