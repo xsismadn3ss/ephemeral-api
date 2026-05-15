@@ -3,20 +3,14 @@ services:
     container_name: ephemeral-api
     build:
       context: .
-    env_file:
-      - .env
     environment:
       ENV: ${ENV:-development}
-      MONGO_URI: mongodb://mongo:27017
+      MONGO_URI: ${MONGO_URI:-mongodb://mongo:27017}
       DB_NAME: ${DB_NAME:-ephemeral}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
       REDIS_USER: ${REDIS_USER:-}
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      PORT: 8000
+      PORT: ${PORT:-8000}
     ports:
-      - "8000:8000"
-
-volumes:
-  mongo_data:
-  redis_data:
+      - "${PORT:-8000}:8000"

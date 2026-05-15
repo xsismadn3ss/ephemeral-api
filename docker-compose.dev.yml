@@ -1,0 +1,54 @@
+services:
+  api:
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - default
+
+  mongo:
+    container_name: ephemeral-mongo
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ephemeral_mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - default
+
+  redis:
+    container_name: ephemeral-redis
+    image: redis:latest
+    command: ["redis-server", "--appendonly", "yes", "--port", "${REDIS_PORT:-6379}"]
+    ports:
+      - "${REDIS_PORT:-6379}:${REDIS_PORT:-6379}"
+    volumes:
+      - ephemeral_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "${REDIS_PORT:-6379}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    networks:
+      - default
+
+volumes:
+  ephemeral_mongo_data:
+  ephemeral_redis_data:
+
+networks:
+  default:
+    name: ephemeral-network
