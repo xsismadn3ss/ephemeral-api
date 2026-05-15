@@ -1,76 +1,41 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends
-from enum import Enum
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from src.app.application.receipts_service import ReceiptAppService
 from src.app.models import Receipt, ReceiptInput
-from src.app.services import receipt as receipt_service
-from src.app.services import cache
-from src.app.utils.mongo import Database, get_db
-from src.app.utils.redis import Redis, get_redis
 from src.app.models.output import MessageOutput
+from src.app.dependencies import get_receipt_app_service
 
 router = APIRouter(prefix="/receipts", tags=["receipts"])
-
-
-class CacheKeys(Enum):
-    ALL_RECEIPTS = "receipts:all"
-    RECEIPT = "receipts:{id}"
 
 
 # listar facturas
 @router.get("/", response_model=List[Receipt])
 async def list_receipts(
-    db: Annotated[Database, Depends(get_db)],
-    redis: Annotated[Redis, Depends(get_redis)],
+    service: Annotated[ReceiptAppService, Depends(get_receipt_app_service)],
 ):
-    # Intentar obtener facturas desde la caché
-    receipts = cache.get(CacheKeys.ALL_RECEIPTS.value, redis)
-    if receipts:
-        return receipts["receipts"]
-
-    receipts = receipt_service.list(db)
-
-    # Guardar facturas en la caché
-    cache.set(CacheKeys.ALL_RECEIPTS.value, {"receipts": receipts}, redis)
-    return receipts
+    return service.list_receipts()
 
 
 # Obtener por id
 @router.get("/{id}", response_model=Receipt)
 async def get_receipt(
     id: str,
-    db: Annotated[Database, Depends(get_db)],
-    redis: Annotated[Redis, Depends(get_redis)],
+    service: Annotated[ReceiptAppService, Depends(get_receipt_app_service)],
 ):
-
-    cache_key = CacheKeys.RECEIPT.value.format(id=id)
-    receipt = cache.get(cache_key, redis)
-    if receipt:
-        return receipt["receipt"]
-
-    receipt = receipt_service.get(db, id)
-
-    # Guardar factura en la caché
-    cache.set(cache_key, {"receipt": receipt}, redis, ex=60 * 3)
+    receipt = service.get_receipt(id)
+    if receipt is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Receipt not found"
+        )
     return receipt
 
 
 @router.post("/", response_model=MessageOutput)
 async def create_receipt(
-    db: Annotated[Database, Depends(get_db)],
     receipt: ReceiptInput,
-    redis: Annotated[Redis, Depends(get_redis)],
+    service: Annotated[ReceiptAppService, Depends(get_receipt_app_service)],
 ):
-    result = receipt_service.create(db, receipt)
-    # Invalidar caché de facturas
-    cache.delete(CacheKeys.ALL_RECEIPTS.value, redis)
-    # Cachear nueva factura
-    cache.set(
-        CacheKeys.RECEIPT.value.format(id=result["receipt_id"]),
-        {"receipt": result},
-        redis,
-        ex=60 * 3,
-    )
-
+    result = service.create_receipt(receipt)
     return {"message": "Receipt created successfully", **result}

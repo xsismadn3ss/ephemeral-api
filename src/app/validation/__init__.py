@@ -30,5 +30,5 @@ async def startup(app: FastAPI):
         status.update("Validando conexión a Redis...")
         check_redis(config)
 
-    console.print("[dim]Infraestructura validada correctamente ✅[/]")
+    console.log("[dim]Infraestructura validada correctamente ✅[/]", emoji=True)
     yield

@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 
 from src.app.config import APP_Config, get_config
-from src.app.services import products
+from src.app.infrastructure.mongo.products_repository import MongoProductRepository
 from src.app.utils import mongo
 
 
@@ -22,11 +22,12 @@ def check_mongo(config: Annotated[APP_Config, Depends(get_config)]):
 
 def check_mongo_indexes(config: Annotated[APP_Config, Depends(get_config)]):
     db = mongo.get_db(config)
-    indexes = products.get_indexes(db)
+    repository = MongoProductRepository(db)
+    indexes = repository.get_indexes()
     # Buscar si hay indice llamadao products_expiresAt_ttl
     if "products_expiresAt_ttl" not in indexes:
         from rich.console import Console
 
         console = Console()
-        products.ensure_product_indexes(db)
+        repository.ensure_indexes()
         console.log("[dim]Indices de la colección 'products' asegurados[/]")
